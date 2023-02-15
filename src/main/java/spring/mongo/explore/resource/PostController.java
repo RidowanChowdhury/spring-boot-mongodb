@@ -36,6 +36,36 @@ public class PostController {
         return postService.searchByAllProperties(text);
     }
 
+    @GetMapping("/posts/2/{text}")
+    public List<Post> search2(@PathVariable String text) {
+        long start = System.nanoTime();
+        List<Post> res = postService.searchByAllProperties2(text);
+        System.out.println(System.nanoTime() - start);
+        return res;
+    }
+
+    @GetMapping("/posts/3/{text}")
+    public List<Post> search3(@PathVariable String text) {
+        long start = System.nanoTime();
+        List<Post> res = postService.aggregateWithPOJO(text);
+        System.out.println(System.nanoTime() - start);
+        return res;
+    }
+
+    @GetMapping("/posts/4/{text}")
+    public List<Post> search4(@PathVariable String text) {
+        long start = System.nanoTime();
+        List<Post> res = postService.aggregateWithPOJO4(text);
+        System.out.println(System.nanoTime() - start);
+        return res;
+    }
+
+    @GetMapping("/posts/5/{text}")
+    public List<Post> findByExp(@PathVariable int text) {
+        return postService.repositorySearch(text);
+    }
+
+
     @PostMapping("/post")
     @CrossOrigin
     public Post addPost(@RequestBody Post post) {
