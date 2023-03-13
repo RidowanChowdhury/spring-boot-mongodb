@@ -27,26 +27,26 @@ public class PostService {
     @Autowired
     MongoConverter converter;
 
-    public List<Post> searchByAllProperties(String data) {
+    public List<Post> searchByAllPropertiesWithClient(String data) {
         MongoDatabase database = client.getDatabase("jobApplication");
         MongoCollection<Document> collection = database.getCollection("JobPost");
 
         AggregateIterable<Document> documents = collection.aggregate(
                 Arrays.asList(
                         new Document("$search",
-                new Document("index", "allsearch")
-                        .append("text",
-                                new Document("query", data)
-                                        .append("path",
-                                                new Document("wildcard", "*"))))));
+                                new Document("index", "allsearch")
+                                        .append("text",
+                                                new Document("query", data)
+                                                        .append("path",
+                                                                new Document("wildcard", "*"))))));
         final List<Post> posts = new ArrayList<>();
         documents.forEach(doc -> posts.add(converter.read(Post.class, doc)));
         return posts;
 
     }
 
-    public List<Post> searchByAllProperties2(String data) {
-        List<Bson> pipeline =  Arrays.asList(
+    public List<Post> searchByAllPropertiesWithTemplate_1(String data) {
+        List<Bson> pipeline = Arrays.asList(
                 new Document("$search",
                         new Document("index", "allsearch")
                                 .append("text",
@@ -67,14 +67,15 @@ public class PostService {
 
     }
 
-    public List<Post> aggregateWithPOJO(String data) {
-        List<Bson> pipeline =  Arrays.asList(
+    public List<Post> aggregateWithPOJOWithTemplate_2(String data) {
+        List<Bson> pipeline = Arrays.asList(
                 new Document("$search",
                         new Document("index", "allsearch")
                                 .append("text",
                                         new Document("query", data)
                                                 .append("path",
                                                         new Document("wildcard", "*")))));
+
 
         MongoIterable<Post> result = mongoTemplate
                 .getCollection("JobPost")
@@ -85,13 +86,13 @@ public class PostService {
     }
 
 
-    public List<Post> aggregateWithPOJO4(String data) {
-        List<Bson> pipeline =  Arrays.asList(new Document("$search",
-                new Document("index", "allsearch")
+    public List<Post> aggregateWithPOJOWithTemplate_3(String data) {
+        List<Bson> pipeline = Arrays.asList(new Document("$search",
+                        new Document("index", "allsearch")
 
-                        .append("text",
-                                new Document("query", data)
-                                        .append("path", Arrays.asList( "desc")))),
+                                .append("text",
+                                        new Document("query", data)
+                                                .append("path", Arrays.asList("desc")))),
                 new Document("$sort",
                         new Document("exp", -1L)));
 
@@ -109,7 +110,29 @@ public class PostService {
         return res.orElse(null);
     }
 
+    public Document aggregateExplainWithPOJOWithTemplate_2(String data) {
+        Document pipeline =
+
+                new Document("$search",
+                        new Document("index", "allsearch")
+                                .append("text",
+                                        new Document("query", data)
+                                                .append("path",
+                                                        new Document("wildcard", "*"))));
 
 
+        List<Bson> bsons = Arrays.asList(pipeline);
 
+        AggregateIterable<Document> result = mongoTemplate
+                .getCollection("JobPost")
+
+                .aggregate(bsons);
+        ArrayList<Document> documents = new ArrayList<>(2);
+        for (Document document : result) {
+            documents.add(document);
+        }
+        return result.explain();
     }
+
+
+}

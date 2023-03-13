@@ -1,5 +1,6 @@
 package spring.mongo.explore.resource;
 
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import spring.mongo.explore.Service.PostService;
@@ -33,13 +34,13 @@ public class PostController {
 
     @GetMapping("/posts/{text}")
     public List<Post> search(@PathVariable String text) {
-        return postService.searchByAllProperties(text);
+        return postService.searchByAllPropertiesWithClient(text);
     }
 
     @GetMapping("/posts/2/{text}")
     public List<Post> search2(@PathVariable String text) {
         long start = System.nanoTime();
-        List<Post> res = postService.searchByAllProperties2(text);
+        List<Post> res = postService.searchByAllPropertiesWithTemplate_1(text);
         System.out.println(System.nanoTime() - start);
         return res;
     }
@@ -47,15 +48,21 @@ public class PostController {
     @GetMapping("/posts/3/{text}")
     public List<Post> search3(@PathVariable String text) {
         long start = System.nanoTime();
-        List<Post> res = postService.aggregateWithPOJO(text);
+        List<Post> res = postService.aggregateWithPOJOWithTemplate_2(text);
         System.out.println(System.nanoTime() - start);
+        return res;
+    }
+
+    @GetMapping("/posts/33/{text}")
+    public Document search33(@PathVariable String text) {
+        Document res = postService.aggregateExplainWithPOJOWithTemplate_2(text);
         return res;
     }
 
     @GetMapping("/posts/4/{text}")
     public List<Post> search4(@PathVariable String text) {
         long start = System.nanoTime();
-        List<Post> res = postService.aggregateWithPOJO4(text);
+        List<Post> res = postService.aggregateWithPOJOWithTemplate_3(text);
         System.out.println(System.nanoTime() - start);
         return res;
     }
